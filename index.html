@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ms. Mia's English Class - Unit 6</title>
+    <style>
+        :root {
+            --bg-color: #fdf5e6;
+            --accent-color: #ff9a9e;
+            --text-color: #4a4a4a;
+            --highlight-color: #fff176;
+            --button-bg: #ffffff;
+            --active-button: #8ed1fc;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(#ffe4b5 10%, transparent 10%),
+                linear-gradient(135deg, #fdf5e6 0%, #ffecd2 100%);
+            background-size: 30px 30px, 100% 100%;
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar Navigation */
+        #sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border-right: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        #logo-container {
+            position: sticky;
+            top: 0;
+            padding: 20px 10px;
+            text-align: center;
+            background: transparent;
+        }
+
+        #logo-container img {
+            max-width: 160px;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #d4a373;
+            text-align: center;
+            margin: 5px 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #button-list-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 15px 20px 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .story-btn {
+            width: 100%;
+            background: var(--button-bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .story-btn.active {
+            background: var(--active-button);
+            color: white;
+            border-color: #0693e3;
+        }
+
+        /* Main Reading Area */
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .instruction {
+            text-align: center;
+            font-weight: bold;
+            color: #b5835a;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        #reading-box {
+            background: rgba(255, 255, 255, 0.92);
+            flex: 1;
+            border-radius: 35px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            line-height: 1.7;
+            font-size: 2.1rem;
+            overflow-y: auto;
+            border: 6px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .word {
+            display: inline-block;
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 8px;
+            transition: background 0.1s;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .word.playing {
+            background: var(--highlight-color) !important;
+            transform: scale(1.1);
+        }
+
+        /* Mobile Layout Adjustments */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            #sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 35vh;
+                border-right: none;
+                border-bottom: 2px solid white;
+            }
+            #logo-container { padding: 10px; }
+            #logo-container img { max-width: 100px; }
+            h2 { font-size: 1rem; margin: 0 0 5px 0; }
+            #button-list-wrapper {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 10px;
+                gap: 10px;
+            }
+            .story-btn {
+                width: auto;
+                white-space: nowrap;
+                margin-bottom: 0;
+                padding: 8px 12px;
+            }
+            #main-content { padding: 15px; }
+            #reading-box { font-size: 1.5rem; padding: 20px; border-radius: 20px; }
+            .instruction { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="sidebar">
+        <div id="logo-container">
+            <img src="logo.png" alt="Ms. Mia Logo">
+        </div>
+        <h2>Unit 6</h2>
+        <div id="button-list-wrapper">
+            <div id="button-list"></div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <div class="instruction">💻 Click a word | 📱 Double-tap a word</div>
+        <div id="reading-box"></div>
+    </main>
+
+    <script>
+        const stories = [
+            { title: "1. If You’re Happy", text: "If you’re happy and you know it,\nclap your hands.\nIf you’re happy and you know it,\nclap your hands.\nIf you’re happy and you know it,\nthen your face will always show it.\nIf you’re happy and you know it,\nclap your hands.\n\nIf you’re happy and you know it,\nstomp your feet.\nIf you’re happy and you know it,\nstomp your feet.\nIf you’re happy and you know it,\nthen your face will always show it.\nIf you’re happy and you know it,\nstomp your feet.\n\nIf you’re happy and you know it,\nshout “Hurray!”\nIf you’re happy and you know it,\nshout “Hurray!”\nIf you’re happy and you know it,\nthen your face will always show it.\nIf you’re happy and you know it,\nshout “Hurray!”\n\nIf you’re happy and you know it,\ndo all three!\nIf you’re happy and you know it,\ndo all three!\nIf you’re happy and you know it,\nthen your face will always show it.\nIf you’re happy and you know it,\ndo all three!" },
+            { title: "2. Excuse Me!", text: "It’s good to say, “Excuse me, please,”\nfor a burp or sneeze.\nWhen you make a sound like these,\njust say, “Excuse me, please!”\n\nExcuse me! Please, excuse me\nfor bumping into you!\nSay “Excuse me! Please, excuse me!”\nThat’s the nice thing to do!" },
+            { title: "3. Big, Big Turkey", text: "I’m a big, big turkey.\nI eat and eat.\nI am so fat,\nI can’t see my feet!\n\nWhen I run,\nI wobble, wobble, wobble.\nWhen I talk,\nI gobble, gobble, gobble!\n\nI’m a big, big turkey.\nI eat and eat!" },
+            { title: "4. Laugh!", text: "Let’s all laugh. Ha-ha!\nLaugh with me. Ha-ha!\nIt’s so much fun. Yes, you will see.\nCome laugh with me!\n\nLet’s all cry. Boo-hoo!\nCry with me. Boo-hoo!\nIt’s so much fun. Yes, you will see.\nCome cry with me!\n\nLet’s all cough. Ah-eh!\nCough with me. Ah-eh!\nIt’s so much fun. Yes, you will see.\nCome cough with me!\n\nLet’s all sneeze. Ah-choo!\nSneeze with me. Ah-choo!\nIt’s so much fun. Oh, you will see.\nCome sneeze with me!\n\nLet’s all yawn. Aaa-aaw!\nYawn with me. Aaa-aaw!\nIt’s so much fun. Oh, you will see.\nCome yawn with me!\n\nLet’s all hiccup. Hiccup!\nHiccup with me. Hiccup!\nIt’s so much fun. Oh, you will see.\nCome hiccup with me!\n\nLet’s all snore. Zzz-zzzz!\nSnore with me. Zzz-zzzz!\nIt’s so much fun—oh, you will see—\nto do these things with me!" },
+            { title: "5. Be Nice", text: "Don’t hit or kick or pinch your friends.\nDon’t fight or pull their hair.\nDon’t scratch or hurt them anywhere.\nBe nice, like Jonny Bear!" },
+            { title: "6. Weekends Are Cool", text: "Monday, Tuesday, Wednesday, Thursday, Friday—\non all those days, I go to school.\nThen comes Saturday and Sunday.\nI’m with my family, and that is cool!\n\nMonday, Tuesday, Wednesday, Thursday, Friday—\non all those days, I go to school.\nThen comes Saturday and Sunday.\nI’m with my family, and that is cool!" },
+            { title: "7. Yes, I Do!", text: "What do you want?\nDo you want some milk?\nNo, I don’t. I do not!\nDo you want some orange juice?\nYes, I do! I want orange juice.\n\nWhat do you want?\nDo you want some rice?\nNo, I don’t. I do not!\nDo you want a hot dog?\nYes, I do! I want a hot dog.\n\nWhat do you want?\nDo you want a hot dog?\nNo, I don’t. I do not!\nDo you want a hamburger?\nYes, I do! I want a hamburger.\n\nWhat do you want?\nDo you want some popcorn?\nNo, I don’t. I do not!\nDo you want some chips?\nYes, I do! I want some chips.\n\nWhat do you want?\nDo you want some salad?\nNo, I don’t. I do not!\nDo you want some soup?\nYes, I do! I want some soup.\n\nWhat do you want?\nDo you want some sandwiches?\nNo, I don’t. I do not!\nDo you want some sweets?\nYes, I do! I want some sweets." },
+            { title: "8. Cow, Cow", text: "Cow, cow, all white and black,\ngive me some milk for my snack.\n\nCow, cow, all white and black,\ngive me ice cream for my snack.\n\nCow, cow, all white and black,\ngive me some cheese for my snack.\n\nCow, cow, all white and black,\ngive me butter for my snack.\n\nCow, cow, the cow I see,\ncome and have a snack with me." },
+            { title: "9. Freeze!", text: "List 1\nClap your hands.\nBrush your hair.\nStomp your feet.\nKnock on the floor.\nEat your lunch.\nGrow big and get small.\nSpin around.\nPull your nose.\nHide your face.\nHide your nose.\nHold your knees.\nPush your nose.\nFeel your toes.\nPick one foot off the floor.\nPut it down and pick up the other foot.\n\nList 2\nHop up and down.\nKnock on your head.\nLaugh.\nOpen your mouth.\nClose your mouth.\nPat your head.\nPoint to a friend.\nPoint to another friend.\nPull your ears.\nRaise your left hand.\nRaise your right hand.\nRide a horse.\nRub your arms.\nTurn around and look behind you.\nThen do it again.\nShake your body.\nFreeze!" },
+            { title: "10. Pizza", text: "Pizza for breakfast!\nPizza for lunch!\nPizza for dinner!\nMunch, munch, munch!" },
+            { title: "11. Jam", text: "Jam on my pancake.\nJam on my bread.\nJam in my donut,\nbut not on my head!" },
+            { title: "12. Ice Cream", text: "I like ice cream.\nTonya does too.\nSam likes ice cream.\nHow about you?" },
+            { title: "13. Yellow", text: "Yellow things,\nyellow things\nare everywhere\nyou look.\n\nYellow pencils,\nyellow paint,\nand there is\na yellow book!\n\nYellow shirts,\nyellow socks,\nyellow gloves\nand hats,\n\nyellow chicks\nand yellow ducks,\nand there is\na yellow cat!" },
+            { title: "14. Six", text: "I see six lions\nsleeping\nin the sun.\n\nI see six zebras\nstarting to run.\n\nI see six little\nbaby kangaroos.\n\nI see them all\nat the zoo." },
+            { title: "15. Sad Sam", text: "This is the story of a very bad boy.\nThis is Sam.\n\nBefore breakfast, Sam ate ten cookies!\nFor breakfast, Sam’s mother fixed eggs and ham,\npancakes, juice, and milk.\n“I’m not hungry,” said Sam,\n“and I’m not thirsty.\nI don’t want to eat breakfast.”\n\nBefore lunch, Sam ate ice cream and jam.\nFor lunch, Sam’s mother made pizza,\nhamburgers, and hot dogs.\n“I’m not hungry!” said Sam.\n“I don’t want to eat lunch.”\n\nBefore snack time, Sam ate five donuts.\nFor a snack, Sam’s mother fixed popcorn\nand little cheese sandwiches.\n“I’m not hungry!” said Sam.\n“I don’t want to eat a snack.”\n\nBefore dinner, Sam ate some cake and chips.\nFor dinner, Sam’s mother made turkey,\nnoodles, salad, and bread and butter.\n“I’m full!” said Sam.\n“I don’t want to eat dinner.”\nBut then he ate some candy!\n\nWhen it was time to go to bed,\nSam could not go to sleep.\n“My stomach hurts!” he cried.\n\nSo don’t be like Sam,\nwho ate too many sweets.\nAlways eat your soup and spaghetti,\nyour rice, and your meat.\n\nWhy?\nIf you eat too many sweets,\nyou’ll be sad—just like Sam!" },
+            { title: "16. The Red Hen", text: "A red hen once lived on a farm.\nShe had six little chicks.\nEvery day she looked here and there\nfor food for her little chicks to eat.\n\nOne day, the red hen watched the farmer.\nHe was putting seeds into the ground.\n“Now grow!” he said.\n\nIn the morning, the red hen went out\nto find some seeds.\n“I will make my garden,” she said.\n\nThe seeds grew and grew.\nSoon the red hen’s garden was full of many things.\n\n“Who will help me work in the garden?”\nthe red hen said to her friends.\n“Not me!” said the fat pig.\n“Not me!” said the pink sheep.\n“Not me!” said the thin goat.\n\n“Then I will do it myself,” said the red hen.\nAnd she did!\n\nThen the red hen went to see the friendly cow.\n“Will you give me some milk?” she said.\n“I will,” said the friendly cow.\n\nThe red hen made cheese from the milk.\n\nNow the red hen had everything she needed.\n“Who will help me make pizza?”\nshe said to her friends.\n“Not me!” said the fat pig.\n“Not me!” said the pink sheep.\n“Not me!” said the thin goat.\n\n“Then I will do it myself,” said the red hen.\nAnd she did!\n\nThe other animals smelled the pizza.\nYummm. It smelled good!\n\nThe red hen said,\n“Now who will help me eat the pizza?”\n“I will!” said the fat pig.\n“I will!” said the pink sheep.\n“I will!” said the thin goat.\n\nThe red hen said,\n“You would not help me work in the garden.\nYou would not help me make the pizza.\nNow you cannot help me eat the pizza!”\n\nSo the red hen and her little chicks\nsat down to eat pizza with the friendly cow!" },
+            { title: "17. Jam, Jam", text: "Jam, jam, on my bread,\nI like jam on my bread!\n\nHam, ham, on my pizza,\nI like ham on my pizza!\n\nEggs, eggs, with my rice,\nI like eggs with my rice!\n\nNoodles, noodles, in my soup,\nI like noodles in my soup!\n\nCheese, cheese, in my sandwich,\nI like cheese in my sandwich!\n\nMilk, milk, with my cookies,\nI like milk with my cookies!\n\nMeat, meat, in my spaghetti,\nI like meat in my spaghetti!\n\nButter, butter, on my popcorn,\nI like butter on my popcorn!\n\nChicken, chicken, with my salad,\nI like chicken with my salad!\n\nCandy, candy, on my ice cream,\nI like candy on my ice cream!\n\nCake, cake, for my birthday,\nI like cake for my birthday!" },
+            { title: "18. The Bears’ Picnic", text: "The bear families are going on a picnic\nafter breakfast!\n\nThese little bears are eating eggs.\nThose bears are eating pancakes with butter.\nThese bears are drinking milk.\nOops, those bears spilled some juice!\n\nFreddy’s mother made these salads\nand those cookies.\nEddie’s mother made these noodles\nand those donuts.\nMolly’s mother made these pizzas\nand those candies.\nAnd Holly’s mother made these six cakes\nand those sandwiches.\n\nThe fathers fixed the meat.\n“Our stomachs are empty.\nIs it time to eat?”\n\n“Do you want these hamburgers\nor those hot dogs?”\n“We want both of them—\nhamburgers AND hot dogs!”\n\n“Our stomachs were empty,\nbut now they are full!”\n\nAfter the picnic,\nthe bears went home.\n\nThese bears ate ham and rice for dinner.\nThose bears had soup and spaghetti.\nThese bears fixed popcorn.\nAnd those bears ate ice cream.\nIt was a very good day!" },
+            { title: "19. Jonny Bear Helps His Father", text: "“Mrs. Giraffe wants some beans.\nWhere are they, Father?”\n“They are behind the onions.”\n“Oh, there they are!” said Jonny.\n“I found them.”\n\nJonny Bear’s friends said,\n“Wait, Jonny. Where are you going?\nWe want to play jump rope.”\n“I’m going to work with my father,” said Jonny.\n“Bye-bye!”\n“Bye-bye!” his friends yelled\nas they waved goodbye to Jonny.\n\n“If a melon is hard, it is good to eat,”\ndid Mrs. Gorilla.\n“If it is too soft, it is not good.\nThat melon is bad.”\n\n“I need something for lunch.\nWill you cut up these kiwis and tomatoes for me?”\nsaid Miss Monkey.\n\n“We must wash off the mud.\nThese vegetables grow in the ground,\nso they are dirty.\nMany fruits hang from trees,\nso they are clean.”\n\nJonny was nice to everybody.\n“Welcome, Mrs. Kangaroo!\nMay I help you?”\n“I would like three cucumbers,\ntwo lemons, and one beet, please.”\n“Do you want them in a bag?”\n“No, I will just put them in my pocket!”\n\nMrs. Lion wanted a big watermelon.\n“Father, please help me!\nI can push this watermelon,\nbut I can’t pick it up!”\n\n“Please wait, Mrs. Elephant,\nand I will put these grapes in a bag for you!”\n“Thank you, Jonny.”\n\nJonny smiled at Mrs. Ostrich.\n“Hello, may I help you?”\n“I’ll take one of your nice, round pumpkins.”\n“This one?”\n“No, that other one.\nI think it will make a funny jack-o’-lantern!”\n\nMrs. Elephant wanted some grapes.\n“Who grew these nice fruits and vegetables, Jonny?”\n“Farmer Brown grows them for us.\nHe lives near us.”\n“I will get these cherries.\nMr. Fox would like a cherry pie for dinner.”\n\nThat night, Father Bear said,\n“Jonny, you were a great help today!”\n“I was glad to help you, Father.\nCan we pick some flowers for Mother?\nShe will like them!”\n\n“Jonny! Oh, flowers!\nAnd grapes!”" }
+        ];
+
+        const buttonList = document.getElementById('button-list');
+        const readingBox = document.getElementById('reading-box');
+        const synth = window.speechSynthesis;
+        let preferredVoice = null;
+        let speechAllowed = false;
+
+        function setPreferredVoice() {
+            const voices = synth.getVoices();
+            preferredVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Samantha'))) || 
+                             voices.find(v => v.lang === 'en-US') || 
+                             voices[0];
+        }
+
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = setPreferredVoice;
+        }
+
+        function enableAudioOniOS() {
+            if (!speechAllowed) {
+                const initialUtterance = new SpeechSynthesisUtterance("");
+                synth.speak(initialUtterance);
+                speechAllowed = true;
+            }
+        }
+        
+        document.body.addEventListener('touchstart', enableAudioOniOS, { passive: true });
+        document.body.addEventListener('click', enableAudioOniOS);
+
+        function init() {
+            buttonList.innerHTML = '';
+            stories.forEach((story, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'story-btn';
+                btn.innerText = story.title;
+                btn.onclick = () => loadStory(index);
+                buttonList.appendChild(btn);
+            });
+            loadStory(0);
+            setPreferredVoice();
+        }
+
+        function loadStory(index) {
+            const buttons = document.querySelectorAll('.story-btn');
+            buttons.forEach((btn, i) => btn.classList.toggle('active', i === index));
+
+            readingBox.innerHTML = '';
+            const lines = stories[index].text.split('\n');
+
+            lines.forEach(line => {
+                if (line.trim() === "") {
+                    readingBox.appendChild(document.createElement('br'));
+                    return;
+                }
+                const lineDiv = document.createElement('div');
+                const parts = line.split(/(\s+)/); 
+
+                parts.forEach(part => {
+                    if (part.trim() === "") {
+                        lineDiv.appendChild(document.createTextNode(part));
+                    } else {
+                        const span = document.createElement('span');
+                        span.className = 'word';
+                        span.innerText = part;
+
+                        let lastTap = 0;
+
+                        // Touch Path for Mobile Devices
+                        span.addEventListener('touchend', function(e) {
+                            const currentTime = new Date().getTime();
+                            const tapLength = currentTime - lastTap;
+                            if (tapLength < 300 && tapLength > 0) {
+                                e.preventDefault();
+                                speak(part, span);
+                            }
+                            lastTap = currentTime;
+                        });
+
+                        // Click Path for Desktop
+                        span.addEventListener('click', function(e) {
+                            if (e.pointerType !== 'touch') {
+                                speak(part, span);
+                            }
+                        });
+
+                        span.addEventListener('contextmenu', e => e.preventDefault());
+                        lineDiv.appendChild(span);
+                    }
+                });
+                readingBox.appendChild(lineDiv);
+            });
+            readingBox.scrollTop = 0;
+        }
+
+        function speak(word, element) {
+            document.querySelectorAll('.word.playing').forEach(el => el.classList.remove('playing'));
+            synth.cancel();
+
+            const cleanWord = word.replace(/[.,!?;:””’\"“\"]/g, "");
+            const utterance = new SpeechSynthesisUtterance(cleanWord);
+            
+            utterance.rate = 0.65; 
+            utterance.pitch = 1.1;
+            
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            } else {
+                utterance.lang = 'en-US';
+            }
+
+            utterance.onstart = () => element.classList.add('playing');
+            utterance.onend = () => element.classList.remove('playing');
+            
+            synth.speak(utterance);
+        }
+
+        init();
+    </script>
+</body>
+</html>
